@@ -1,22 +1,18 @@
 import { useState } from 'react';
 import ResumeEditor from './components/ResumeEditor';
-
-const dummyResume = {
-  name: "John Doe",
-  summary: "Experienced software engineer with a focus on backend development.",
-  experience: ["Software Engineer at Google", "Intern at Amazon"],
-  education: ["B.Tech in Computer Science"],
-  skills: ["Python", "React", "Docker"]
-};
+import ResumeUpload from './components/ResumeUpload';
 
 function App() {
-  const [resume, setResume] = useState(dummyResume);
+  const [resume, setResume] = useState(null);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6 font-sans">
-      <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-2xl p-8">
-        <h1 className="text-3xl font-bold text-indigo-700 mb-6 text-center">Resume Editor</h1>
-        <ResumeEditor resume={resume} setResume={setResume} />
+    <div className="min-h-screen bg-gray-900 p-6 font-sans text-gray-100">
+      <div className="max-w-3xl mx-auto bg-gray-800 shadow-2xl rounded-2xl p-8">
+        <h1 className="text-3xl font-bold text-indigo-400 mb-6 text-center">AI Resume Editor</h1>
+
+        <ResumeUpload setResume={setResume} />
+
+        {resume && <ResumeEditor resume={resume} setResume={setResume} />}
       </div>
     </div>
   );

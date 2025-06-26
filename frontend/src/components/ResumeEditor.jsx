@@ -2,7 +2,7 @@ import SectionEditor from "./SectionEditor";
 
 function ResumeEditor({ resume, setResume }) {
   const handleEnhance = async (section, content) => {
-    const res = await fetch("http://localhost:8000/ai-enhance", {
+    const res = await fetch("http://localhost:3001/ai-enhance", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ section, content }),
@@ -16,7 +16,7 @@ function ResumeEditor({ resume, setResume }) {
   };
 
   const handleSave = async () => {
-    await fetch("http://localhost:8000/save-resume", {
+    await fetch("http://localhost:3001/save-resume", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(resume),
@@ -45,10 +45,16 @@ function ResumeEditor({ resume, setResume }) {
         />
       ))}
       <div className="flex gap-4 justify-center pt-4">
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow" onClick={handleSave}>
+        <button
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-md transition"
+          onClick={handleSave}
+        >
           Save to Backend
         </button>
-        <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow" onClick={downloadResume}>
+        <button
+          className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg shadow-md transition"
+          onClick={downloadResume}
+        >
           Download JSON
         </button>
       </div>
