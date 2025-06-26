@@ -1,0 +1,15 @@
+{
+  "name": "John Doe",
+  "summary": "Experienced software engineer...",
+  "experience": [
+    "Google",
+    "Amazon"
+  ],
+  "education": [
+    "B.Tech - CS"
+  ],
+  "skills": [
+    "Python",
+    "React"
+  ]
+}
