@@ -13,7 +13,7 @@ export default function ResumeUpload({ onParsed }) {
         formData.append("file", file);
 
         setLoading(true);
-        const res = await fetch("https://localhost:3001/upload-resume", {
+        const res = await fetch("http://localhost:3001/upload-resume", {
             method: "POST",
             body: formData,        
         });
@@ -21,7 +21,6 @@ export default function ResumeUpload({ onParsed }) {
         onParsed(data);
         setLoading(false);
     };
-
 
   return (
     <div className="my-4">

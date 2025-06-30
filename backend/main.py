@@ -17,7 +17,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -27,27 +27,37 @@ app.add_middleware(
 def extract_text_and_links(file_bytes):
     text = ""
     links = []
-    
-    with fitz.open(stream=file_bytes, filetype="pdf") as doc:
-        for i, page in enumerate(doc, start=1):
-            text += page.get_text()
-            for link in page.get_links():
-                if link.get("uri"):
-                    label = page.get_textbox(link["from"]).strip()
-                    links.append({"test": label, "uri": link["uri"]})
-    
-    return text, links
+
+    try:
+        with fitz.open(stream=file_bytes, filetype="pdf") as doc:
+            for i, page in enumerate(doc, start=1):
+                text += page.get_text()
+                for link in page.get_links():
+                    if link.get("uri"):
+                        label = page.get_textbox(link["from"]).strip()
+                        links.append({"text": label, "uri": link["uri"]})
+        return text, links
+    except Exception as e:
+        print("❌ Failed to extract text/links:", e)
+        return "", []  # fallback to empty values to avoid crash
+
 
 # 2) AI Resume parser
 def parse_resume_with_ai(text, links):
     link_str = "\n".join(f"{l['text']} -> {l['uri']}" for l in links)
     prompt = f"""
-    You are a resume parsing assistant.
-    From the resume text below, extract logical sections (like Education, Projects, Skills, etc) and return them as a JSON object:
-    - Keys = section names (e.g., "Education", "Technical Skills")
-    - Values = section content (string or list)
-    - For any embedded links in the pdf, extract both the anchor text and the actual link
-    - Don't add explanations.
+    You are an intelligent resume parser.
+
+    Parse the following resume text and return a JSON object where:
+    - Each key corresponds EXACTLY to the section heading as it appears in the resume (e.g., "EDUCATION", "TECHNICAL SKILLS", "ACADEMIC PROJECTS", "EXTRA CURRICULARS AND OTHERS").
+    - DO NOT invent new sections or split existing ones.
+    - DO NOT combine unrelated items into the same section.
+    - Preserve the groupings and titles from the document.
+    - Values can be strings or arrays depending on how the section is structured.
+    - DO NOT add "Interests", "Certifications", or any other headers as a separate fields unless they were originally written as such.
+    - All the content should be displayed only under the exact header.
+    - All headers should be in the exact sequence as in the uploaded pdf.
+    - DO NOT consider the bullet points as separate fields or headers, all the bullets should be under one single header mentioned above the content.
     
     Resume Text: 
     \"\"\"{text}\"\"\"
@@ -70,6 +80,7 @@ def parse_resume_with_ai(text, links):
         return json.loads(response.choices[0].message.content.strip())
     
     except Exception as e:
+        print("❌ AI returned invalid JSON:", response.choices[0].message.content)
         return {"error": "Could not parse AI response", "details":str(e)}
 
 
@@ -82,6 +93,7 @@ async def upload_resume(file: UploadFile = File(...)):
         return parsed
     
     except Exception as e:
+        print("❌ Error in upload-resume:", e)
         return {"error": "Failed to process resume", "details": str(e)}
 
 
